@@ -24,22 +24,36 @@ fn main() {
         b.retain(|x| !x.is_whitespace());
         b.reverse();
     }
+    let mut boxes_2 = boxes.clone();
 
-    for mov in moves.lines() {
-        let (_, a) = mov.split_at(5);
-        let a: Vec<usize> = a
-            .replace(" to ", " from ")
-            .split(" from ")
-            .map(|x| x.parse::<usize>().unwrap())
-            .collect();
-        for _ in 0..a[0] {
-            let box_from = *boxes[a[1] - 1].first().unwrap();
-            boxes[a[2] - 1].insert(0, box_from);
-            boxes[a[1] - 1].remove(0);
+    let ins = moves
+        .lines()
+        .map(|x| x.split_at(5))
+        .map(|(_, x)| {
+            x.replace(" to ", " from ")
+                .split(" from ")
+                .map(|x| x.parse::<usize>().unwrap())
+                .collect()
+        })
+        .collect::<Vec<Vec<usize>>>();
+    for mov in ins.iter() {
+        let (ins, from, to) = (mov[0], mov[1], mov[2]);
+        for _ in 0..ins {
+            let box_from = *boxes[from - 1].first().unwrap();
+            boxes[to - 1].insert(0, box_from);
+            boxes[from - 1].remove(0);
         }
     }
     let top_creates: String = boxes.iter().map(|x| x.first().unwrap()).collect();
-    println!("In top of stacks end {} crates.", top_creates);
+    println!("{} end at the top of the stack of crates.", top_creates);
 
-    // Part 2 🚧
+    // Part 2
+    for mov in ins.iter() {
+        let (ins, from, to) = (mov[0], mov[1], mov[2]);
+        let removed_from: Vec<char> =
+            (*boxes_2[from - 1].splice(0..ins, []).collect::<Vec<char>>()).to_vec();
+        boxes_2[to - 1].splice(0..0, removed_from.iter().cloned());
+    }
+    let top_creates: String = boxes_2.iter().map(|x| x.first().unwrap()).collect();
+    println!("{} end at the top of the stack of crates(2).", top_creates);
 }
