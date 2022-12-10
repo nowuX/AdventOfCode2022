@@ -11,9 +11,9 @@ fn main() {
             .map(|x| x.split("-").map(|x| x.parse::<i32>().unwrap()).collect())
             .collect();
 
-        let is_first_contain = (pair[0][0] <= pair[1][0]) && (pair[0][1] >= pair[1][1]);
-        let is_second_contain = (pair[0][0] >= pair[1][0]) && (pair[0][1] <= pair[1][1]);
-        if is_first_contain || is_second_contain {
+        let is_first_contained = (pair[0][0] <= pair[1][0]) && (pair[0][1] >= pair[1][1]);
+        let is_second_contained = (pair[0][0] >= pair[1][0]) && (pair[0][1] <= pair[1][1]);
+        if is_first_contained || is_second_contained {
             overlap_full += 1;
         }
     }
