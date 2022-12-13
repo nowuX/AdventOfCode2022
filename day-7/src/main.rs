@@ -30,6 +30,16 @@ fn main() {
     }
     println!(
         "Sum of directories {}.",
-        tree.into_values().filter(|x| *x < 100000).sum::<i32>()
+        tree.clone()
+            .into_values()
+            .filter(|x| *x < 100000)
+            .sum::<i32>()
+    );
+
+    // Part 2
+    let required: i32 = tree.get(&PathBuf::from("/")).unwrap() - 40_000_000;
+    println!(
+        "The size of that directory is {}.",
+        tree.into_values().filter(|x| x >= &required).min().unwrap()
     );
 }
