@@ -1,30 +1,35 @@
-use std::{collections::HashMap, fs};
+use std::{collections::HashMap, fs, path::PathBuf};
 
 fn main() {
-    let text: String = fs::read_to_string("input_2.txt").unwrap();
+    let text: String = fs::read_to_string("input.txt").unwrap();
 
     // Part 1
-    let mut cwd: &str = "/";
+    let mut tree: HashMap<PathBuf, i32> = HashMap::new();
+    let mut route: Vec<&str> = Vec::new();
 
-    let mut tree: HashMap<&str, i32> = HashMap::new();
     for line in text.lines() {
-        let match_1 = line.chars().take(4).collect::<String>();
-        match match_1.as_str() {
-            "$ cd" => {
-                let xd = cwd.clone();
-                match line.chars().skip(5).take(2).collect::<String>().as_str() {
-                    ".." => cwd = &xd.split("/").collect::<Vec<&str>>()[..xd.len() - 1].join("/"),
-                    "/" => cwd = "/",
-                    _ => cwd = &format!("{}", xd),
+        let xs: Vec<&str> = line.split_whitespace().collect();
+        match xs[..] {
+            ["$", "ls"] => continue,
+            ["dir", _folder] => continue,
+            ["$", "cd", ".."] => {
+                route.pop();
+            }
+            ["$", "cd", folder] => {
+                route.push(folder);
+            }
+            [size, _file] => {
+                let size: i32 = size.parse().unwrap();
+                for i in 0..route.len() {
+                    let path = PathBuf::from_iter(&route[..=i]);
+                    *tree.entry(path).or_insert(0) += size;
                 }
             }
-            "$ ls" => {}
-            "dir " => {}
-            _ => {
-                let (a, _) = line.split_once(" ").unwrap();
-                let folder_size = tree.entry("").or_insert(0);
-                *folder_size += a.to_string().parse::<i32>().unwrap();
-            }
-        };
+            _ => {}
+        }
     }
+    println!(
+        "Sum of directories {}.",
+        tree.into_values().filter(|x| *x < 100000).sum::<i32>()
+    );
 }
